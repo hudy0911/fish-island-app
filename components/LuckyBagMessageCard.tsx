@@ -16,7 +16,7 @@ export default function LuckyBagMessageCard({ content, md }: LuckyBagMessageCard
   if (!parsed?.luckyBagId) {
     return (
       <View style={styles.fallback}>
-        <Text style={styles.fallbackText}>福袋</Text>
+        <Text selectable={false} style={styles.fallbackText}>福袋</Text>
       </View>
     );
   }
@@ -24,10 +24,10 @@ export default function LuckyBagMessageCard({ content, md }: LuckyBagMessageCard
   return (
     <>
       <View style={styles.inline}>
-        {parsed.prefix ? <Text style={styles.prefix}>{parsed.prefix}</Text> : null}
+        {parsed.prefix ? <Text selectable={false} style={styles.prefix}>{parsed.prefix}</Text> : null}
         <TouchableOpacity style={styles.trigger} onPress={() => setModalVisible(true)} activeOpacity={0.85}>
           <Image source={{ uri: LUCKY_BAG_IMAGE }} style={styles.image} contentFit="contain" />
-          <Text style={styles.triggerText}>点击参与福袋</Text>
+          <Text selectable={false} style={styles.triggerText}>点击参与福袋</Text>
         </TouchableOpacity>
       </View>
       <LuckyBagDetailModal

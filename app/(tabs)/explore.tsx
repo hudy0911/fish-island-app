@@ -49,7 +49,6 @@ export default function ProfileScreen() {
       followingCount: userInfo.followingUserCount,
       isAdmin: userInfo.userRole === 'admin',
       userOnlineFlag: userInfo.userOnlineFlag,
-      userProfile: userInfo.userProfile,
     };
   }, [userInfo]);
 
