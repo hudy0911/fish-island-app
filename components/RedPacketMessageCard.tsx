@@ -123,7 +123,7 @@ export default function RedPacketMessageCard({
   if (!parsed) {
     return (
       <View style={styles.fallback}>
-        <Text style={styles.fallbackText}>红包</Text>
+        <Text selectable={false} style={styles.fallbackText}>红包</Text>
       </View>
     );
   }
@@ -131,22 +131,22 @@ export default function RedPacketMessageCard({
   return (
     <View style={[styles.card, finished && styles.cardFinished]}>
       <View style={styles.contentRow}>
-        <Text style={styles.icon}>🧧</Text>
+        <Text selectable={false} style={styles.icon}>🧧</Text>
         <View style={styles.info}>
-          <Text style={styles.typeLabel}>{typeLabel}</Text>
-          <Text style={styles.msgText} numberOfLines={2}>
+          <Text selectable={false} style={styles.typeLabel}>{typeLabel}</Text>
+          <Text selectable={false} style={styles.msgText} numberOfLines={2}>
             {displayName}
           </Text>
         </View>
       </View>
 
       <View style={styles.footerRow}>
-        <Text style={styles.amountText}>
+        <Text selectable={false} style={styles.amountText}>
           {loadingDetail && amount === 0 ? '...' : amount}
-          <Text style={styles.amountUnit}> 积分</Text>
+          <Text selectable={false} style={styles.amountUnit}> 积分</Text>
         </Text>
         <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>
+          <Text selectable={false} style={styles.statusText}>
             {finished ? '已领完' : `剩余${remaining}/${total}个`}
           </Text>
         </View>
@@ -154,7 +154,7 @@ export default function RedPacketMessageCard({
 
       {grabbedAmount !== null && (
         <View style={styles.grabbedResult}>
-          <Text style={styles.grabbedResultText}>已抢到 {grabbedAmount} 积分</Text>
+          <Text selectable={false} style={styles.grabbedResultText}>已抢到 {grabbedAmount} 积分</Text>
         </View>
       )}
 
@@ -168,7 +168,7 @@ export default function RedPacketMessageCard({
           {grabbing ? (
             <ActivityIndicator color="#ff4d4f" size="small" />
           ) : (
-            <Text style={styles.grabButtonText}>
+            <Text selectable={false} style={styles.grabButtonText}>
               {isQuizPacket ? '答题抢红包' : '抢红包'}
             </Text>
           )}
@@ -180,7 +180,7 @@ export default function RedPacketMessageCard({
         onPress={() => onViewDetails(message)}
         activeOpacity={0.8}
       >
-        <Text style={styles.viewDetailsText}>查看详情</Text>
+        <Text selectable={false} style={styles.viewDetailsText}>查看详情</Text>
       </TouchableOpacity>
 
       <Modal

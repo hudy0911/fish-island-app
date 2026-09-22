@@ -132,7 +132,7 @@ export default function ContextMenu({
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    backgroundColor: 'transparent',
   },
   menu: {
     position: 'absolute',

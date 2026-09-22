@@ -352,10 +352,10 @@ export interface MomentCardProps {
   isAdmin?: boolean;
   theme: typeof Colors['light'];
   comments: MomentComment[];
-  showInput: boolean;
+  showInput?: boolean;
   onLike: (m: Moment) => void;
   onToggleComment: (id: number) => void;
-  onReply: (c: MomentComment, momentId: number) => void;
+  onReply: (c: MomentComment, momentId: number, rootCommentId?: number) => void;
   onDeleteComment: (commentId: number, momentId: number) => void;
   onAvatarPress: (userId: number, userName: string) => void;
   onReward?: (m: Moment) => void;
@@ -555,7 +555,7 @@ export default function MomentCard({
                   theme={theme}
                   onReply={(comment, rootId) => onReply(comment, item.id, rootId)}
                   onDelete={onDeleteComment}
-                  inputAnchorId={inputAnchorId}
+                  inputAnchorId={inputAnchorId === 'first' ? null : inputAnchorId}
                   renderInputAfter={renderInputAfter}
                 />
               ))}
@@ -624,7 +624,7 @@ const cardStyles = (theme: typeof Colors['light']) =>
       borderTopColor: theme.border,
     },
     expandText: { fontSize: 12, marginTop: 6 },
-    inputRow: { marginTop: 8 },
+    inputRow: { marginTop: 8, marginBottom: 8 },
     inputRowInline: { marginLeft: 36, marginBottom: 4 },
     firstCommentWrap: {
       marginTop: 12,

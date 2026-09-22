@@ -1,20 +1,20 @@
 import { chatApi, ChatMessage, OnlineUser } from '@/api/chat';
+import { LuckyBag, luckyBagApi } from '@/api/luckyBag';
+import { userRemarkApi } from '@/api/userRemark';
+import ContextMenu, { ContextMenuItem } from '@/components/ContextMenu';
 import EmojiPicker from '@/components/EmojiPicker';
 import ImageMessage from '@/components/ImageMessage';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
-import ContextMenu, { ContextMenuItem } from '@/components/ContextMenu';
-import { userRemarkApi } from '@/api/userRemark';
 import LuckyBagDetailModal from '@/components/LuckyBagDetailModal';
 import LuckyBagDialog from '@/components/LuckyBagDialog';
 import LuckyBagMessageCard from '@/components/LuckyBagMessageCard';
+import OtherUserPetModal, { OtherPetTarget } from '@/components/pet/OtherUserPetModal';
 import RedPacketDetailModal from '@/components/RedPacketDetailModal';
 import RedPacketDialog from '@/components/RedPacketDialog';
 import RedPacketMessageCard from '@/components/RedPacketMessageCard';
-import { luckyBagApi, LuckyBag } from '@/api/luckyBag';
-import OtherUserPetModal, { OtherPetTarget } from '@/components/pet/OtherUserPetModal';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import UserDetailModal from '@/components/UserDetailModal';
 import UserInfoCard, { UserProfileSnapshot } from '@/components/UserInfoCard';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useUser } from '@/contexts/UserContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -36,31 +36,31 @@ import { isLuckyBagContent, LUCKY_BAG_IMAGE } from '@/utils/luckyBag';
 import { isRedPacketContent, parseRedPacketContent } from '@/utils/redPacket';
 import { toast } from '@/utils/toast';
 import wsManager, { BACKEND_HOST_WS } from '@/utils/websocket';
-import * as Clipboard from 'expo-clipboard';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Clipboard from 'expo-clipboard';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Dimensions,
-    FlatList,
-    Image,
-    Keyboard,
-    KeyboardEvent,
-    Modal,
-    Platform,
-    StyleSheet,
-    Text,
-    Pressable,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  FlatList,
+  Image,
+  Keyboard,
+  KeyboardEvent,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -749,12 +749,6 @@ export default function ChatroomScreen() {
     if (atBottom) {
       setNewMessageCount(0);
       lastMessageCountRef.current = 0;
-    } else if (lastMessageCountRef.current > 0) {
-      const maxDistance = 500;
-      const ratio = Math.min(distanceToBottom / maxDistance, 1);
-      const next = Math.max(Math.floor(lastMessageCountRef.current * ratio), 0);
-      setNewMessageCount(next);
-      if (next === 0) lastMessageCountRef.current = 0;
     }
 
     // 滚到顶部时加载历史消息（参考 utools scrollTop === 0）
@@ -1497,10 +1491,10 @@ export default function ChatroomScreen() {
       const quotedPacket = parseRedPacketContent(quotedContent);
       return (
         <View style={styles.quotedRedPacket}>
-          <Text style={styles.quotedRedPacketIcon}>🧧</Text>
+          <Text selectable={false} style={styles.quotedRedPacketIcon}>🧧</Text>
           <View style={styles.quotedRedPacketInfo}>
-            <Text style={styles.quotedRedPacketType}>红包</Text>
-            <Text style={styles.quotedRedPacketMsg} numberOfLines={1}>
+            <Text selectable={false} style={styles.quotedRedPacketType}>红包</Text>
+            <Text selectable={false} style={styles.quotedRedPacketMsg} numberOfLines={1}>
               {quotedPacket?.msg || '红包'}
             </Text>
           </View>
@@ -1519,7 +1513,7 @@ export default function ChatroomScreen() {
             resizeMode="cover"
           />
           {quotedImageUrls.length > 1 && (
-            <Text style={[styles.quotedImageMore, { color: theme.icon }]}>
+            <Text selectable={false} style={[styles.quotedImageMore, { color: theme.icon }]}>
               +{quotedImageUrls.length - 1}
             </Text>
           )}
@@ -1528,7 +1522,7 @@ export default function ChatroomScreen() {
     }
 
     return (
-      <Text style={[styles.quotedText, { color: theme.icon }]} numberOfLines={compact ? 1 : 2}>
+      <Text selectable={false} style={[styles.quotedText, { color: theme.icon }]} numberOfLines={compact ? 1 : 2}>
         {processMessageContent(quotedContent)}
       </Text>
     );
@@ -1544,7 +1538,7 @@ export default function ChatroomScreen() {
 
     return (
       <View style={[styles.quotedMessage, { backgroundColor: isSelf ? 'rgba(255,255,255,0.2)' : theme.background }]}>
-        <Text style={[styles.quotedSender, { color: theme.tint }]} numberOfLines={1}>
+        <Text selectable={false} style={[styles.quotedSender, { color: theme.tint }]} numberOfLines={1}>
           {quotedSender}
         </Text>
         {renderQuotedContentBody(quotedContent)}
@@ -1630,7 +1624,7 @@ export default function ChatroomScreen() {
         >
           {/* 非自己的消息显示昵称 */}
           {!isSelf && (
-            <Text style={[styles.senderName, { color: isDark ? '#b0b0b0' : '#666' }]}>
+            <Text selectable={false} style={[styles.senderName, { color: isDark ? '#b0b0b0' : '#666' }]}>
               {getUserDisplayName(item.userId, item.userName, item.userNickname)}
             </Text>
           )}
@@ -1655,11 +1649,11 @@ export default function ChatroomScreen() {
               isSelf={isSelf}
             />
           ) : (
-            <Text style={[styles.messageText, { color: theme.text }]}>
+            <Text selectable={false} style={[styles.messageText, { color: theme.text }]}>
               {processMessageContent(item.content)}
             </Text>
           )}
-          <Text style={[styles.messageTime, { color: theme.icon }]}>
+          <Text selectable={false} style={[styles.messageTime, { color: theme.icon }]}>
             {item.time ? new Date(item.time).toLocaleTimeString() : ' '}
           </Text>
         </Pressable>
@@ -1791,6 +1785,8 @@ export default function ChatroomScreen() {
             keyboardShouldPersistTaps="handled"
             onScroll={checkIfAtBottom}
             scrollEventThrottle={16}
+            removeClippedSubviews={Platform.OS === 'android'}
+            disableScrollViewPanResponder={Platform.OS === 'ios'}
             ListHeaderComponent={
               isLoadingMore ? (
                 <ActivityIndicator style={styles.loadingMore} color={theme.tint} />
@@ -2097,7 +2093,7 @@ export default function ChatroomScreen() {
                     setLuckyBagListVisible(false);
                   }}
                 >
-                  <Image source={{ uri: LUCKY_BAG_IMAGE }} style={styles.luckyBagListImage} contentFit="contain" />
+                  <Image source={{ uri: LUCKY_BAG_IMAGE }} style={styles.luckyBagListImage} resizeMode="contain" />
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.luckyBagListName, { color: theme.text }]}>{bag.name || '福袋'}</Text>
                     <Text style={{ color: theme.icon, fontSize: 12, marginTop: 4 }}>

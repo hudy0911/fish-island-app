@@ -84,7 +84,7 @@ export default function ImageMessage({
                 <Image source={{ uri: url }} style={styles.nineImage} resizeMode="cover" />
                 {index === 8 && urls.length > 9 && (
                   <View style={styles.moreImagesOverlay}>
-                    <Text style={styles.moreImagesText}>+{urls.length - 9}</Text>
+                    <Text selectable={false} style={styles.moreImagesText}>+{urls.length - 9}</Text>
                   </View>
                 )}
               </>,
