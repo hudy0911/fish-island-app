@@ -20,7 +20,6 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -31,6 +30,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Alert } from '@/utils/alert';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 10;
@@ -829,16 +829,30 @@ export default function MomentsScreen() {
       {!viewingProfile ? (
         <View style={s.header}>
           <Text style={s.headerTitle}>鱼小圈</Text>
-          {isLoggedIn && (
-            <TouchableOpacity onPress={handleViewSelf} style={s.myCircleBtn}>
-              <Text style={{ color: theme.tint, fontSize: 14, fontWeight: '600' }}>我的</Text>
+          <View style={s.headerRight}>
+            <TouchableOpacity 
+              onPress={() => fetchMoments(1, true, filterUserId ?? undefined)} 
+              style={s.refreshBtn}
+            >
+              <Text style={{ color: theme.tint, fontSize: 20 }}>↻</Text>
             </TouchableOpacity>
-          )}
+            {isLoggedIn && (
+              <TouchableOpacity onPress={handleViewSelf} style={s.myCircleBtn}>
+                <Text style={{ color: theme.tint, fontSize: 14, fontWeight: '600' }}>我的</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       ) : (
         <View style={s.headerCompact}>
           <TouchableOpacity onPress={handleBack} style={s.backBtn}>
             <Text style={[s.backText, { color: theme.tint }]}>‹ 返回</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => fetchMoments(1, true, filterUserId ?? undefined)} 
+            style={s.refreshBtn}
+          >
+            <Text style={{ color: theme.tint, fontSize: 20 }}>↻</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -986,8 +1000,18 @@ const screenStyles = (theme: typeof Colors['light']) => StyleSheet.create({
     borderBottomColor: theme.border,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  myCircleBtn: { marginLeft: 'auto' },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    gap: 12,
+  },
+  refreshBtn: {
+    padding: 4,
+  },
+  myCircleBtn: {},
   backBtn: { paddingRight: 4 },
   backText: { fontSize: 17, fontWeight: '500' },
   headerTitle: { fontSize: 18, fontWeight: '700', color: theme.text },

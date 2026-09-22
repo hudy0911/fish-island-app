@@ -46,7 +46,6 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   FlatList,
   Image,
@@ -67,6 +66,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert } from '@/utils/alert';
 
 const CONNECTION_ID = 'chatroom';
 
@@ -935,8 +935,10 @@ export default function ChatroomScreen() {
 
   const pickImage = async () => {
     try {
+      console.log('=== 开始选择图片 ===');
       // Request permission
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log('权限请求结果:', permissionResult);
       if (permissionResult.granted === false) {
         Alert.alert('权限请求', '需要访问相册权限才能选择图片');
         return;
@@ -949,24 +951,34 @@ export default function ChatroomScreen() {
         quality: 1, // 原图质量，后续用 ImageManipulator 压缩
         allowsMultipleSelection: false,
       });
+      console.log('图片选择结果:', result);
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
+        console.log('选中的图片资源:', asset);
 
         try {
           // Show loading state
           setIsUploading(true);
 
           // 压缩图片
+          console.log('开始压缩图片, URI:', asset.uri);
           const compressedUri = await compressImage(asset.uri);
+          console.log('压缩后的URI:', compressedUri);
 
           // Upload image to server
-          const ext = asset.uri.split('.').pop()?.toLowerCase() || 'jpg';
+          // 从 mimeType 推断扩展名，而不是从 URI（Web 环境下 URI 是 blob URL）
+          const mimeType = asset.mimeType || asset.type || 'image/jpeg';
+          const ext = mimeType.split('/').pop()?.toLowerCase() || 'jpg';
           const fileName = `image_${Date.now()}.${ext}`;
+          console.log('准备上传图片, 文件名:', fileName, '文件类型:', mimeType);
+          
           const uploadResponse = await chatApi.uploadImage(compressedUri, fileName);
+          console.log('上传响应:', uploadResponse);
 
           if (uploadResponse && uploadResponse.code === 0) {
             const imageUrl = uploadResponse.data;
+            console.log('上传成功, 图片URL:', imageUrl);
 
             // Create image message with uploaded URL
             const imageContent = `[img]${imageUrl}[/img]`;
@@ -1024,18 +1036,19 @@ export default function ChatroomScreen() {
               Alert.alert('发送失败', '图片消息发送失败，请重试');
             }
           } else {
+            console.error('上传失败，响应码不为0:', uploadResponse);
             throw new Error(uploadResponse?.message || uploadResponse?.msg || '上传失败');
           }
         } catch (uploadError) {
-          console.error('图片上传失败:', uploadError);
-          Alert.alert('上传失败', '图片上传失败，请重试');
+          console.error('图片上传失败详情:', uploadError);
+          Alert.alert('上传失败', `图片上传失败: ${uploadError instanceof Error ? uploadError.message : '未知错误'}`);
         } finally {
           setIsUploading(false);
         }
       }
     } catch (error) {
-      console.error('选择图片失败:', error);
-      Alert.alert('错误', '选择图片时发生错误');
+      console.error('选择图片失败详情:', error);
+      Alert.alert('错误', `选择图片时发生错误: ${error instanceof Error ? error.message : '未知错误'}`);
     }
   };
 
