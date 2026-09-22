@@ -115,14 +115,11 @@ export default function MomentsScreen() {
         current: p, pageSize: PAGE_SIZE, sortField: 'createTime', sortOrder: 'descend',
         ...(userId != null ? { userId } : {}),
       };
-      console.log('[fetchMoments] 请求参数:', JSON.stringify(params));
       const res = await momentsApi.listMoments(params);
-      console.log('[fetchMoments] 响应:', JSON.stringify(res));
       if (res.code === 0 && res.data) {
         const records = (res.data.records || []).sort(
           (a, b) => (b.isTop || 0) - (a.isTop || 0),
         );
-        console.log('[fetchMoments] 获取到动态数:', records.length, '总数据:', res.data.total);
         setMoments(prev => p === 1 ? records : [...prev, ...records]);
         setPage(p);
         setHasMore(p * PAGE_SIZE < (res.data.total || 0));
@@ -130,7 +127,6 @@ export default function MomentsScreen() {
         records.forEach(m => { if (m.commentNum > 0) loadComments(m.id); });
       } else {
         // non-zero code — stop loading, show empty list
-        console.log('[fetchMoments] 非成功响应:', res.code, res.message);
         if (p === 1) setMoments([]);
         setHasMore(false);
       }
@@ -502,7 +498,6 @@ export default function MomentsScreen() {
     setFilterUserId(targetUserId);
     setFilterUserName(userInfo.userName || '');
     // 先用 userInfo 作为后备显示
-    console.log('[handleViewSelf] userInfo.id:', userInfo.id, 'targetUserId:', targetUserId);
     setLoginUserExtra({
       id: userInfo.id,
       userId: userInfo.id,

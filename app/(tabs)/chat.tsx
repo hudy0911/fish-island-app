@@ -935,10 +935,8 @@ export default function ChatroomScreen() {
 
   const pickImage = async () => {
     try {
-      console.log('=== 开始选择图片 ===');
       // Request permission
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      console.log('权限请求结果:', permissionResult);
       if (permissionResult.granted === false) {
         Alert.alert('权限请求', '需要访问相册权限才能选择图片');
         return;
@@ -951,34 +949,27 @@ export default function ChatroomScreen() {
         quality: 1, // 原图质量，后续用 ImageManipulator 压缩
         allowsMultipleSelection: false,
       });
-      console.log('图片选择结果:', result);
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        console.log('选中的图片资源:', asset);
 
         try {
           // Show loading state
           setIsUploading(true);
 
           // 压缩图片
-          console.log('开始压缩图片, URI:', asset.uri);
           const compressedUri = await compressImage(asset.uri);
-          console.log('压缩后的URI:', compressedUri);
 
           // Upload image to server
           // 从 mimeType 推断扩展名，而不是从 URI（Web 环境下 URI 是 blob URL）
           const mimeType = asset.mimeType || asset.type || 'image/jpeg';
           const ext = mimeType.split('/').pop()?.toLowerCase() || 'jpg';
           const fileName = `image_${Date.now()}.${ext}`;
-          console.log('准备上传图片, 文件名:', fileName, '文件类型:', mimeType);
           
           const uploadResponse = await chatApi.uploadImage(compressedUri, fileName);
-          console.log('上传响应:', uploadResponse);
 
           if (uploadResponse && uploadResponse.code === 0) {
             const imageUrl = uploadResponse.data;
-            console.log('上传成功, 图片URL:', imageUrl);
 
             // Create image message with uploaded URL
             const imageContent = `[img]${imageUrl}[/img]`;

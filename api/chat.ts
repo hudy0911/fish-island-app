@@ -207,10 +207,6 @@ export const chatApi = {
 
   // 上传图片
   async uploadImage(uri: string, fileName: string) {
-    console.log('=== chatApi.uploadImage 开始 ===');
-    console.log('URI:', uri);
-    console.log('文件名:', fileName);
-    
     const formData = new FormData();
 
     // 根据文件扩展名推断 MIME 类型
@@ -221,16 +217,13 @@ export const chatApi = {
       webp: 'image/webp',
     };
     const fileType = mimeMap[ext ?? ''] ?? 'image/jpeg';
-    console.log('文件类型:', fileType);
 
     // 判断是否为 Web 环境（blob URL）
     if (uri.startsWith('blob:')) {
-      console.log('检测到 Web 环境，从 blob URL 读取文件');
       try {
         // 从 blob URL 获取实际的文件数据
         const response = await fetch(uri);
         const blob = await response.blob();
-        console.log('Blob 大小:', blob.size, '类型:', blob.type);
         
         // 将 Blob 添加到 FormData
         formData.append('file', blob, fileName);
@@ -240,7 +233,6 @@ export const chatApi = {
       }
     } else {
       // React Native 环境：使用特定的文件对象格式
-      console.log('使用 React Native 格式');
       formData.append('file', { uri, type: fileType, name: fileName } as any);
     }
 
@@ -248,10 +240,6 @@ export const chatApi = {
     const tokenName = await request.getTokenName();
     const tokenValue = await request.getTokenValue();
     const apiKey = await request.getApiKey();
-    
-    console.log('认证信息 - tokenName:', tokenName);
-    console.log('认证信息 - tokenValue:', tokenValue ? '存在' : '不存在');
-    console.log('认证信息 - apiKey:', apiKey ? '存在' : '不存在');
 
     // 构建请求头（不手动设置 Content-Type，让 fetch 自动附加 boundary）
     const headers: Record<string, string> = {};
@@ -262,17 +250,12 @@ export const chatApi = {
     if (tokenName && tokenValue) {
       // 优先使用 token 认证
       headers[tokenName] = tokenValue;
-      console.log('使用 token 认证');
     } else if (apiKey) {
       // 回退到 apiKey
       url += `&apiKey=${apiKey}`;
-      console.log('使用 apiKey 认证');
     } else {
       console.warn('没有认证信息！');
     }
-
-    console.log('请求URL:', url);
-    console.log('请求头:', headers);
 
     try {
       const response = await fetch(url, {
@@ -281,9 +264,6 @@ export const chatApi = {
         body: formData,
       });
 
-      console.log('响应状态:', response.status);
-      console.log('响应状态文本:', response.statusText);
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error('响应错误内容:', errorText);
@@ -291,7 +271,6 @@ export const chatApi = {
       }
 
       const result = await response.json();
-      console.log('上传成功，响应结果:', result);
       return result;
     } catch (error) {
       console.error('fetch 请求异常:', error);
